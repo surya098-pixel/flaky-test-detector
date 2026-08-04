@@ -1,0 +1,44 @@
+name: Dogfood — detect flakiness in own tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  dogfood:
+    name: Run own tests 5x, detect flakiness in own suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+
+      - name: Run own test suite 5 times, emit JUnit XML per run
+        shell: bash
+        run: |
+          mkdir -p .flaky-runs
+          for i in 1 2 3 4 5; do
+            echo "▶ Run $i/5"
+            npx vitest run --reporter=junit --outputFile=".flaky-runs/run-$i.xml" || true
+          done
+
+      - name: Analyze with self
+        shell: bash
+        run: |
+          node dist/cli.js analyze '.flaky-runs/run-*.xml' --format text
+          node dist/cli.js analyze '.flaky-runs/run-*.xml' --format markdown >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload run artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dogfood-junit-runs
+          path: .flaky-runs/
+          retention-days: 14

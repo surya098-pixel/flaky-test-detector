@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="LegacyDialect" tests="2" failures="1">
+  <testcase classname="OldClass" name="always broken">
+    <failure message="Real bug — element removed from DOM">selector no longer matches</failure>
+  </testcase>
+  <testcase classname="OldClass" name="always green" time="0.05"/>
+</testsuite>

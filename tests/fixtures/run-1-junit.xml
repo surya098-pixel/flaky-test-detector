@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="run-1" tests="5" failures="1" errors="0" skipped="1">
+  <testsuite name="LoginSuite" tests="3" failures="1" errors="0" skipped="0" time="1.234">
+    <testcase classname="LoginSuite" name="valid credentials" time="0.412"/>
+    <testcase classname="LoginSuite" name="invalid credentials show error" time="0.315">
+      <failure message="Timeout of 5000ms exceeded waiting for locator '[data-test=error]'">
+        Timeout of 5000ms exceeded.
+      </failure>
+    </testcase>
+    <testcase classname="LoginSuite" name="logout redirects to home" time="0.507"/>
+  </testsuite>
+  <testsuite name="InventorySuite" tests="2" failures="0" errors="0" skipped="1" time="0.678">
+    <testcase classname="InventorySuite" name="renders product list" time="0.678"/>
+    <testcase classname="InventorySuite" name="filters by category">
+      <skipped/>
+    </testcase>
+  </testsuite>
+</testsuites>

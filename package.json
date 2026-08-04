@@ -1,0 +1,75 @@
+{
+  "name": "flaky-test-detector",
+  "version": "0.1.0",
+  "description": "Framework-agnostic flaky test detector. Runs your test suite N times, aggregates JUnit XML output, and identifies which tests are non-deterministic.",
+  "type": "module",
+  "bin": {
+    "flaky-test-detector": "./dist/cli.js",
+    "ftd": "./dist/cli.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "action.yml",
+    "README.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "dev": "tsx src/cli.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint . --ext .ts",
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write ."
+  },
+  "keywords": [
+    "flaky",
+    "flaky-tests",
+    "test",
+    "testing",
+    "qa",
+    "junit",
+    "junit-xml",
+    "ci",
+    "reliability",
+    "playwright",
+    "jest",
+    "vitest",
+    "mocha",
+    "pytest",
+    "github-action"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/surya098-pixel/flaky-test-detector.git"
+  },
+  "author": "Surya Reddy",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "execa": "^9.4.0",
+    "fast-xml-parser": "^4.5.0",
+    "tinyglobby": "^0.2.10"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "prettier": "^3.3.0",
+    "tsx": "^4.19.0",
+    "typescript": "~5.6.0",
+    "typescript-eslint": "^8.0.0",
+    "vitest": "^2.1.0"
+  },
+  "overrides": {
+    "typescript": "~5.6.0"
+  }
+}

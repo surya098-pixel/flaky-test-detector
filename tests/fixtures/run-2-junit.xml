@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="run-2" tests="5" failures="0" errors="0" skipped="1">
+  <testsuite name="LoginSuite" tests="3" failures="0" errors="0" skipped="0" time="1.100">
+    <testcase classname="LoginSuite" name="valid credentials" time="0.400"/>
+    <testcase classname="LoginSuite" name="invalid credentials show error" time="0.301"/>
+    <testcase classname="LoginSuite" name="logout redirects to home" time="0.399"/>
+  </testsuite>
+  <testsuite name="InventorySuite" tests="2" failures="0" errors="0" skipped="1" time="0.700">
+    <testcase classname="InventorySuite" name="renders product list" time="0.700"/>
+    <testcase classname="InventorySuite" name="filters by category">
+      <skipped/>
+    </testcase>
+  </testsuite>
+</testsuites>

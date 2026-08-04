@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="run-3" tests="5" failures="1" errors="1" skipped="1">
+  <testsuite name="LoginSuite" tests="3" failures="1" errors="0" skipped="0" time="1.500">
+    <testcase classname="LoginSuite" name="valid credentials" time="0.500"/>
+    <testcase classname="LoginSuite" name="invalid credentials show error" time="0.400">
+      <failure message="AssertionError: expected element to be visible">
+        AssertionError: expected error banner to be visible
+      </failure>
+    </testcase>
+    <testcase classname="LoginSuite" name="logout redirects to home" time="0.600"/>
+  </testsuite>
+  <testsuite name="InventorySuite" tests="2" failures="0" errors="1" skipped="1" time="0.900">
+    <testcase classname="InventorySuite" name="renders product list" time="0.900">
+      <error message="Network timeout after 30s">
+        NetworkError: connection reset
+      </error>
+    </testcase>
+    <testcase classname="InventorySuite" name="filters by category">
+      <skipped/>
+    </testcase>
+  </testsuite>
+</testsuites>

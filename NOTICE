@@ -1,0 +1,40 @@
+flaky-test-detector
+Copyright (c) 2026 Surya Reddy
+
+This product includes third-party open-source software declared as npm
+dependencies. None of the third-party code is redistributed as part of this
+repository — it is downloaded from the npm registry at install time.
+
+Selected notable dependencies and their licenses:
+
+--------------------------------------------------------------------------------
+commander (Node CLI framework)
+Copyright (c) TJ Holowaychuk and contributors
+Licensed under the MIT License
+
+execa (Process execution)
+Copyright (c) Sindre Sorhus
+Licensed under the MIT License
+
+fast-xml-parser
+Copyright (c) Amit Kumar Gupta and contributors
+Licensed under the MIT License
+
+tinyglobby
+Copyright (c) SuperchupuDev and contributors
+Licensed under the MIT License
+
+vitest (dev — test framework)
+Copyright (c) Vitest team
+Licensed under the MIT License
+
+TypeScript, typescript-eslint, ESLint, Prettier, tsx
+Various open-source contributors — see the individual package.json files
+of each dependency in node_modules/ after install for full authorship and
+license details.
+--------------------------------------------------------------------------------
+
+Trademarks referenced in this project's README (Playwright, Jest, Vitest,
+Cucumber, JUnit, RSpec, pytest, etc.) are trademarks of their respective
+owners. References are descriptive (nominative fair use), identifying test
+frameworks whose JUnit XML output this tool can consume.

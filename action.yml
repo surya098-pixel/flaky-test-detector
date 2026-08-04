@@ -1,0 +1,135 @@
+name: 'Flaky Test Detector'
+description: 'Detect non-deterministic tests by aggregating JUnit XML from multiple test runs. Framework-agnostic (Playwright, Jest, Vitest, JUnit, pytest, RSpec, etc.).'
+author: 'Surya Reddy'
+branding:
+  icon: 'repeat'
+  color: 'orange'
+
+inputs:
+  patterns:
+    description: 'Space- or comma-separated glob(s) for JUnit XML files to analyze. Point at the artifacts collected from N test-suite runs.'
+    required: true
+  flake-threshold:
+    description: 'A test with flake rate above this (0..1) is flagged as flaky. Default 0 = any single failure counts.'
+    required: false
+    default: '0'
+  min-runs:
+    description: 'Minimum executions before a test can be classified — anything less becomes "sparse".'
+    required: false
+    default: '2'
+  fail-on-flake:
+    description: 'Fail the action if any test is classified as flaky.'
+    required: false
+    default: 'true'
+  comment-pr:
+    description: 'When true and running on a pull_request, post the markdown report as a PR comment.'
+    required: false
+    default: 'true'
+  github-token:
+    description: 'Token used for PR comment posting. Defaults to ${{ github.token }}.'
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  has-flakiness:
+    description: 'true if any test exceeded the flake threshold'
+    value: ${{ steps.detect.outputs.has-flakiness }}
+  flaky-count:
+    description: 'Number of flaky tests found'
+    value: ${{ steps.detect.outputs.flaky-count }}
+  broken-count:
+    description: 'Number of always-failing (stable-fail) tests found'
+    value: ${{ steps.detect.outputs.broken-count }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
+    - name: Install flaky-test-detector
+      shell: bash
+      run: npm install -g "https://github.com/surya098-pixel/flaky-test-detector.git#${GITHUB_ACTION_REF:-main}"
+
+    - name: Run detector
+      id: detect
+      shell: bash
+      env:
+        PATTERNS: ${{ inputs.patterns }}
+        FLAKE_THRESHOLD: ${{ inputs.flake-threshold }}
+        MIN_RUNS: ${{ inputs.min-runs }}
+        FAIL_ON_FLAKE: ${{ inputs.fail-on-flake }}
+      run: |
+        set +e
+        # Normalize patterns: split on comma OR whitespace, keep quoted
+        PATS=$(echo "$PATTERNS" | tr ',' ' ')
+
+        # Human-readable output goes to the log
+        ftd analyze $PATS \
+          --flake-threshold "$FLAKE_THRESHOLD" \
+          --min-runs "$MIN_RUNS"
+        detector_exit=$?
+
+        # Also generate JSON and markdown for outputs / PR comment
+        ftd analyze $PATS \
+          --flake-threshold "$FLAKE_THRESHOLD" \
+          --min-runs "$MIN_RUNS" \
+          --format json > /tmp/ftd-result.json
+
+        ftd analyze $PATS \
+          --flake-threshold "$FLAKE_THRESHOLD" \
+          --min-runs "$MIN_RUNS" \
+          --format markdown > /tmp/ftd-result.md
+
+        has_flakiness=$(node -e "console.log(require('/tmp/ftd-result.json').hasFlakiness)")
+        flaky_count=$(node -e "console.log(require('/tmp/ftd-result.json').flaky.length)")
+        broken_count=$(node -e "console.log(require('/tmp/ftd-result.json').stableFail.length)")
+
+        echo "has-flakiness=$has_flakiness" >> "$GITHUB_OUTPUT"
+        echo "flaky-count=$flaky_count"   >> "$GITHUB_OUTPUT"
+        echo "broken-count=$broken_count" >> "$GITHUB_OUTPUT"
+
+        # Also add to the GitHub step summary
+        cat /tmp/ftd-result.md >> "$GITHUB_STEP_SUMMARY"
+
+        if [ "${FAIL_ON_FLAKE}" = "true" ] && [ "$detector_exit" -ne 0 ]; then
+          exit "$detector_exit"
+        fi
+        exit 0
+
+    - name: Comment on PR
+      if: ${{ inputs.comment-pr == 'true' && github.event_name == 'pull_request' }}
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ inputs.github-token }}
+        script: |
+          const fs = require('node:fs');
+          const body = fs.readFileSync('/tmp/ftd-result.md', 'utf8');
+
+          const marker = '<!-- flaky-test-detector-comment -->';
+          const payload = `${marker}\n${body}`;
+
+          const { data: comments } = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
+          const existing = comments.find((c) => c.body?.includes(marker));
+
+          if (existing) {
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: existing.id,
+              body: payload,
+            });
+          } else {
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: payload,
+            });
+          }
