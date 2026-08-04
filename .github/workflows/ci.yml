@@ -20,7 +20,10 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           cache: npm
-      - run: npm ci
+      # `npm ci` is broken for lockfiles generated on a different OS due to a
+      # long-standing npm bug with optional platform binaries (rollup / lightningcss).
+      # See https://github.com/npm/cli/issues/4828 — `npm install` reconciles.
+      - run: npm install --no-audit --no-fund
       - run: npm run lint
       - run: npm run type-check
       - run: npm run build

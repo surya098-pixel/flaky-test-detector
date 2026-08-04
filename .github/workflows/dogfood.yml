@@ -17,7 +17,8 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
+      # See ci.yml — npm ci breaks with cross-OS lockfiles for optional binaries.
+      - run: npm install --no-audit --no-fund
       - run: npm run build
 
       - name: Run own test suite 5 times, emit JUnit XML per run
